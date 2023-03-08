@@ -27,7 +27,7 @@ def driverInit():
              }
     option.add_experimental_option("prefs", prefs)
 
-    option.add_argument(f"user-agent={useragentstr}")
+    #option.add_argument(f"user-agent={useragentstr}")
     driverr = uc.Chrome(options=option)
     return driverr
 
