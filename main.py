@@ -41,7 +41,7 @@ def driverInit():
 
     option.add_argument(f"user-agent={useragentstr}")
     driverr = uc.Chrome(options=option)
-    return 
+    return driverr
 
 def scroll_down(driver):
     SCROLL_PAUSE_TIME = 1
