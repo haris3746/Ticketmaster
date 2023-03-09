@@ -8,6 +8,8 @@ import ssl
 from email.message import EmailMessage
 import smtplib
 from pymongo import MongoClient
+from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
 
 
 SCRAPPER = False
@@ -15,20 +17,14 @@ SCRAPPER = False
 
 def driverInit():
     # setting options for undetected chrome driver
-    option = uc.ChromeOptions()
-    useragentstr = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36"
-    option.add_argument("--log-level=3")
-    option.add_argument("--headless")
-    option.add_argument("--disable-infobars")
-    option.add_argument("--disable-extensions")
-    prefs = {"credentials_enable_service": False,
-             "profile.password_manager_enabled": False,
-             "profile.default_content_setting_values.notifications": 2
-             }
-    option.add_experimental_option("prefs", prefs)
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("window-size=1400,1500")
 
-    option.add_argument(f"user-agent={useragentstr}")
-    driverr = uc.Chrome(options=option)
+
+
+    driverr = webdriver.Chrome(options=options)
+
     return driverr
 
 def scroll_down(driver):
@@ -50,8 +46,11 @@ def scroll_down(driver):
         time.sleep(2)
 
 def send_email(body, email):
-    email_sender = "muhammadharis3746@gmail.com"
-    email_password = "qwnyuxzodxziplau"
+    with open("email_credentials.txt", "r") as f:
+        lines = [line.rstrip() for line in f]
+        email_sender = lines[0]
+        email_password = lines[1]
+
     email_receiver = str(email)
     subject = "Notification: Tickets Available in Tickets Master"
     em = EmailMessage()
@@ -79,83 +78,92 @@ def add_cart(driver, price, url, email, in_url, input_price):
 
 
 while True:
-
-    print("Turn")
-    cluster = MongoClient("mongodb+srv://user1:yes321@cluster0.m6tusxx.mongodb.net/?retryWrites=true&w=majority")
-    db = cluster["ticketmaster"]
-    collection = db["datafield"]
-    data = list(collection.find())
-    en = len(data)
-    output = data[en - 1]
-    temp = output
-    url = output['url']
-    quantity = output['quantity']
-    input_price = output['price']
-    notification_email = output['email']
-    for i in range(0, len(url)):
-        print("in")
-        driver = driverInit()
-        driver.get(url[i])
-        time.sleep(1)
-        driver.find_element(By.ID, "onetrust-accept-btn-handler").click()
-        # driver.find_element(By.XPATH, "//a[@class='header-my-account-link']//span[1]").click()
-        # time.sleep(3)
-        # driver.find_element(By.ID, "login-email").send_keys("muhammadharis3746@gmail.com")
-        # driver.find_element(By.ID, "login-password").send_keys("Yes54321" + Keys.ENTER)
-        time.sleep(2)
-        scroll_down(driver)
-        try:
-            n = int(driver.find_element(By.XPATH, "//h2[@class='results-filter-info']//strong[1]").text)
-        except:
-            n = 0
-        href = []
-        for u in range(1, n + 1):
-            href.append(
-                driver.find_element(By.XPATH, "(//a[@class='event-result-title-link'])[" + str(u) + "]").get_attribute(
-                    "href"))
-
-        for num in range(0, len(href)):
+    try:
+        print("Turn")
+        cluster = MongoClient("mongodb+srv://user1:yes321@cluster0.m6tusxx.mongodb.net/?retryWrites=true&w=majority")
+        db = cluster["ticketmaster"]
+        collection = db["datafield"]
+        data = list(collection.find())
+        en = len(data)
+        output = data[en - 1]
+        temp = output
+        url = output['url']
+        quantity = output['quantity']
+        input_price = output['price']
+        notification_email = output['email']
+        for i in range(0, len(url)):
+            print("in")
+            driver = driverInit()
+            driver.get(url[i])
+            #time.sleep(1)
+            #driver.find_element(By.ID, "onetrust-accept-btn-handler").click()
+            # driver.find_element(By.XPATH, "//a[@class='header-my-account-link']//span[1]").click()
+            # time.sleep(3)
+            # driver.find_element(By.ID, "login-email").send_keys("muhammadharis3746@gmail.com")
+            # driver.find_element(By.ID, "login-password").send_keys("Yes54321" + Keys.ENTER)
+            time.sleep(2)
+            scroll_down(driver)
             try:
-                driver.get(href[num])
-                time.sleep(3)
-                scroll_down(driver)
-                try:
-                    driver.find_element(By.XPATH, "(//button[contains(@class,'btn btn-outline')]//span)[3]").click()
-                except:
-                    pass
-                time.sleep(2)
-                driver.find_element(By.XPATH,
-                                    "//button[contains(@class,'session-price-foldall-btn btn')]//span[1]").click()
-                time.sleep(2)
-                element = driver.find_element(By.XPATH, "(//span[@class='session-price-cat-title-txt'])[2]")
-
-                actions = ActionChains(driver)
-                actions.move_to_element(element).perform()
-                scroll_down(driver)
-                time.sleep(3)
-                for price in range(1, 25):
-                    try:
-                        prc = driver.find_element(By.XPATH, "(//span[@class='session-price-cat-title-price'])[" + str(
-                            price) + "]").text
-
-                        if int(float(prc.split(" ")[0])) == int(input_price[i]):
-                            status = add_cart(driver, price, href[num], notification_email[i], url[i], input_price)
-                            del temp['url'][i]
-                            del temp['quantity'][i]
-                            del temp['price'][i]
-                            del temp['email'][i]
-                            del temp['_id']
-                            print(temp)
-                            collection.insert_one(temp)
-
-                            break
-                    except:
-                        break
-                if status == "found":
-                    break
+                n = int(driver.find_element(By.XPATH, "//h2[@class='results-filter-info']//strong[1]").text)
             except:
-                continue
-        driver.quit()
+                n = 0
+            href = []
+            for u in range(1, n + 1):
+                href.append(
+                    driver.find_element(By.XPATH,
+                                        "(//a[@class='event-result-title-link'])[" + str(u) + "]").get_attribute(
+                        "href"))
+            print(len(href))
+
+            for num in range(0, len(href)):
+                try:
+                    status = ""
+                    driver.get(href[num])
+                    time.sleep(3)
+                    scroll_down(driver)
+                    try:
+                        driver.find_element(By.XPATH, "(//button[contains(@class,'btn btn-outline')]//span)[3]").click()
+                    except:
+                        pass
+                    time.sleep(2)
+                    driver.find_element(By.XPATH,
+                                        "//button[contains(@class,'session-price-foldall-btn btn')]//span[1]").click()
+                    time.sleep(2)
+                    element = driver.find_element(By.XPATH, "(//span[@class='session-price-cat-title-txt'])[2]")
+
+                    actions = ActionChains(driver)
+                    actions.move_to_element(element).perform()
+                    scroll_down(driver)
+                    time.sleep(3)
+                    for price in range(1, 25):
+                        try:
+                            prc = driver.find_element(By.XPATH,
+                                                      "(//span[@class='session-price-cat-title-price'])[" + str(
+                                                          price) + "]").text
+                            print(prc)
+
+                            if int(float(prc.split(" ")[0])) == int(input_price[i]):
+                                status = add_cart(driver, price, href[num], notification_email[i], url[i], input_price)
+                                del temp['url'][i]
+                                del temp['quantity'][i]
+                                del temp['price'][i]
+                                del temp['email'][i]
+                                del temp['_id']
+                                print(temp)
+                                collection.insert_one(temp)
+
+                                break
+                        except:
+                            break
+                    if status == "found":
+                        break
+                except:
+                    continue
+            driver.quit()
+    except:
+        pass
+
+
 
 
 
