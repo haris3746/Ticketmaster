@@ -140,7 +140,7 @@ while True:
                     try:
                         driver.find_element(By.XPATH, "(//button[contains(@class,'btn btn-outline')]//span)[3]").click()
                     except:
-                        logging.exception('msg')
+                        #logging.exception('msg')
                         pass
                     time.sleep(2)
                     driver.find_element(By.XPATH,
