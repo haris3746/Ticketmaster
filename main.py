@@ -170,6 +170,7 @@ while True:
 
                                 break
                         except:
+                            logging.exception('msg')
                             break
                     if status == "found":
                         break
@@ -177,6 +178,7 @@ while True:
                     continue
             driver.quit()
     except:
+        logging.exception('msg')
         pass
 
 
