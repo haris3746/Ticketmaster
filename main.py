@@ -138,7 +138,7 @@ while True:
                     time.sleep(3)
                     scroll_down(driver)
                     try:
-                        driver.find_element(By.XPATH, "(//button[contains(@class,'btn btn-outline')]//span)[3]").click()
+                        driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[5]/div[1]/button").click()
                     except:
                         #logging.exception('msg')
                         pass
