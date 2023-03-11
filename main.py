@@ -163,7 +163,7 @@ try:
                                                       price) + "]").text
                         print(prc)
 
-                        if int(float(prc.split(" ")[0])) == int(input_price[i]):
+                        if int(float(prc.split(" ")[0])) <= int(input_price[i]):
                             status = add_cart(driver, price, href[num], notification_email[i], url[i], input_price)
                             del temp['url'][i]
                             del temp['quantity'][i]
