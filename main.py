@@ -11,21 +11,19 @@ from pymongo import MongoClient
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 
-
 SCRAPPER = False
 
 
-#def driverInit():
-    # setting options for undetected chrome driver
- #   options = Options()
-  #  options.add_argument("--headless")
-   # options.add_argument("window-size=1400,1500")
+# def driverInit():
+# setting options for undetected chrome driver
+#   options = Options()
+#  options.add_argument("--headless")
+# options.add_argument("window-size=1400,1500")
 
 
+# driverr = webdriver.Chrome(options=options)
 
-    #driverr = webdriver.Chrome(options=options)
-
-    #return driverr
+# return driverr
 def driverInit():
     option = uc.ChromeOptions()
     useragentstr = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36"
@@ -42,6 +40,7 @@ def driverInit():
     option.add_argument(f"user-agent={useragentstr}")
     driverr = uc.Chrome(options=option)
     return driverr
+
 
 def scroll_down(driver):
     SCROLL_PAUSE_TIME = 1
@@ -60,6 +59,7 @@ def scroll_down(driver):
             break
         last_height = new_height
         time.sleep(2)
+
 
 def send_email(body, email):
     with open("email_credentials.txt", "r") as f:
@@ -81,110 +81,106 @@ def send_email(body, email):
 
 
 def add_cart(driver, price, url, email, in_url, input_price):
-    driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[6]/div[2]/div/div[4]/div[1]/ul/li[" + str(price) + "]/div[1]/button").click()
+    driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[6]/div[2]/div/div[4]/div[1]/ul/li[" + str(
+        price) + "]/div[1]/button").click()
     time.sleep(1)
-    driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[6]/div[2]/div/div[4]/div[1]/ul/li[" + str(price) + "]/div[2]/ul/li/div/span[3]/span/button[2]").click()
+    driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[6]/div[2]/div/div[4]/div[1]/ul/li[" + str(
+        price) + "]/div[2]/ul/li/div/span[3]/span/button[2]").click()
     time.sleep(1)
     driver.find_element(By.XPATH, "(//button[contains(@class,'btn btn-special')])[2]").click()
-    body = "Tickets are available for Url " + in_url + " for price of "+ str(input_price[0]) + " Euros \nTicket Url :    " + url
+    body = "Tickets are available for Url " + in_url + " for price of " + str(
+        input_price[0]) + " Euros \nTicket Url :    " + url
     print("yes, tickets are available in this category in url : ", url)
     send_email(body, email)
     print("Email Sent")
     return "found"
 
 
-while True:
-    try:
-        print("Turn")
-        cluster = MongoClient("mongodb+srv://user1:yes321@cluster0.m6tusxx.mongodb.net/?retryWrites=true&w=majority")
-        db = cluster["ticketmaster"]
-        collection = db["datafield"]
-        data = list(collection.find())
-        en = len(data)
-        output = data[en - 1]
-        temp = output
-        url = output['url']
-        quantity = output['quantity']
-        input_price = output['price']
-        notification_email = output['email']
-        for i in range(0, len(url)):
-            print("in")
-            driver = driverInit()
-            driver.get(url[i])
-            time.sleep(1)
-            driver.find_element(By.ID, "onetrust-accept-btn-handler").click()
-            # driver.find_element(By.XPATH, "//a[@class='header-my-account-link']//span[1]").click()
-            # time.sleep(3)
-            # driver.find_element(By.ID, "login-email").send_keys("muhammadharis3746@gmail.com")
-            # driver.find_element(By.ID, "login-password").send_keys("Yes54321" + Keys.ENTER)
-            time.sleep(2)
-            scroll_down(driver)
+try:
+    print("Turn")
+    cluster = MongoClient("mongodb+srv://user1:yes321@cluster0.m6tusxx.mongodb.net/?retryWrites=true&w=majority")
+    db = cluster["ticketmaster"]
+    collection = db["datafield"]
+    data = list(collection.find())
+    en = len(data)
+    output = data[en - 1]
+    temp = output
+    url = output['url']
+    quantity = output['quantity']
+    input_price = output['price']
+    notification_email = output['email']
+    for i in range(0, len(url)):
+        print("in")
+        driver = driverInit()
+        driver.get(url[i])
+        time.sleep(1)
+        driver.find_element(By.ID, "onetrust-accept-btn-handler").click()
+        # driver.find_element(By.XPATH, "//a[@class='header-my-account-link']//span[1]").click()
+        # time.sleep(3)
+        # driver.find_element(By.ID, "login-email").send_keys("muhammadharis3746@gmail.com")
+        # driver.find_element(By.ID, "login-password").send_keys("Yes54321" + Keys.ENTER)
+        time.sleep(2)
+        scroll_down(driver)
+        try:
+            n = int(driver.find_element(By.XPATH, "//h2[@class='results-filter-info']//strong[1]").text)
+        except:
+            n = 0
+        href = []
+        for u in range(1, n + 1):
+            href.append(
+                driver.find_element(By.XPATH,
+                                    "(//a[@class='event-result-title-link'])[" + str(u) + "]").get_attribute(
+                    "href"))
+        print(len(href))
+
+        for num in range(0, len(href)):
             try:
-                n = int(driver.find_element(By.XPATH, "//h2[@class='results-filter-info']//strong[1]").text)
-            except:
-                n = 0
-            href = []
-            for u in range(1, n + 1):
-                href.append(
-                    driver.find_element(By.XPATH,
-                                        "(//a[@class='event-result-title-link'])[" + str(u) + "]").get_attribute(
-                        "href"))
-            print(len(href))
-
-            for num in range(0, len(href)):
+                status = ""
+                driver.get(href[num])
+                time.sleep(3)
+                scroll_down(driver)
                 try:
-                    status = ""
-                    driver.get(href[num])
-                    time.sleep(3)
-                    scroll_down(driver)
-                    try:
-                        driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[5]/div[1]/button").click()
-                    except:
-                        #logging.exception('msg')
-                        pass
-                    time.sleep(2)
-                    driver.find_element(By.XPATH,
-                                        "//button[contains(@class,'session-price-foldall-btn btn')]//span[1]").click()
-                    time.sleep(2)
-                    element = driver.find_element(By.XPATH, "(//span[@class='session-price-cat-title-txt'])[2]")
-
-                    actions = ActionChains(driver)
-                    actions.move_to_element(element).perform()
-                    scroll_down(driver)
-                    time.sleep(3)
-                    for price in range(1, 25):
-                        try:
-                            prc = driver.find_element(By.XPATH,
-                                                      "(//span[@class='session-price-cat-title-price'])[" + str(
-                                                          price) + "]").text
-                            print(prc)
-
-                            if int(float(prc.split(" ")[0])) == int(input_price[i]):
-                                status = add_cart(driver, price, href[num], notification_email[i], url[i], input_price)
-                                del temp['url'][i]
-                                del temp['quantity'][i]
-                                del temp['price'][i]
-                                del temp['email'][i]
-                                del temp['_id']
-                                print(temp)
-                                collection.insert_one(temp)
-
-                                break
-                        except:
-                            #logging.exception('msg')
-                            break
-                    if status == "found":
-                        break
+                    driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[5]/div[1]/button").click()
                 except:
-                    logging.exceotion('msg')
-                    continue
-            driver.quit()
-    except:
-        #logging.exception('msg')
-        pass
+                    # logging.exception('msg')
+                    pass
+                time.sleep(2)
+                driver.find_element(By.XPATH,
+                                    "//button[contains(@class,'session-price-foldall-btn btn')]//span[1]").click()
+                time.sleep(2)
+                element = driver.find_element(By.XPATH, "(//span[@class='session-price-cat-title-txt'])[2]")
 
+                actions = ActionChains(driver)
+                actions.move_to_element(element).perform()
+                scroll_down(driver)
+                time.sleep(3)
+                for price in range(1, 25):
+                    try:
+                        prc = driver.find_element(By.XPATH,
+                                                  "(//span[@class='session-price-cat-title-price'])[" + str(
+                                                      price) + "]").text
+                        print(prc)
 
+                        if int(float(prc.split(" ")[0])) == int(input_price[i]):
+                            status = add_cart(driver, price, href[num], notification_email[i], url[i], input_price)
+                            del temp['url'][i]
+                            del temp['quantity'][i]
+                            del temp['price'][i]
+                            del temp['email'][i]
+                            del temp['_id']
+                            print(temp)
+                            collection.insert_one(temp)
 
-
-
-
+                            break
+                    except:
+                        # logging.exception('msg')
+                        break
+                if status == "found":
+                    break
+            except:
+                logging.exceotion('msg')
+                continue
+        driver.quit()
+except:
+    # logging.exception('msg')
+    pass
