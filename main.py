@@ -132,6 +132,8 @@ try:
                                     "(//a[@class='event-result-title-link'])[" + str(u) + "]").get_attribute(
                     "href"))
         print(len(href))
+        if len(href) == 0:
+            href.append(url[i])
 
         for num in range(0, len(href)):
             try:
