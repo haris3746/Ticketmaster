@@ -85,11 +85,19 @@ def send_email(body, email):
 
 
 def add_cart(driver, price, url, email, in_url, input_price):
-    driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[6]/div[2]/div/div[4]/div[1]/ul/li[" + str(
-        price) + "]/div[1]/button").click()
-    time.sleep(1)
-    driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[6]/div[2]/div/div[4]/div[1]/ul/li[" + str(
-        price) + "]/div[2]/ul/li/div/span[3]/span/button[2]").click()
+    try:
+        driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[6]/div[2]/div/div[4]/div[1]/ul/li[" + str(
+            price) + "]/div[1]/button").click()
+        time.sleep(1)
+        driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[6]/div[2]/div/div[4]/div[1]/ul/li[" + str(
+            price) + "]/div[2]/ul/li/div/span[3]/span/button[2]").click()
+    except:
+
+        driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[6]/div[2]/div/div[3]/div[1]/ul/li[" + str(
+            price) + "]/div[1]/button").click()
+        time.sleep(1)
+        driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[6]/div[2]/div/div[3]/div[1]/ul/li[" + str(
+            price) + "]/div[2]/ul/li/div/span[3]/span/button[2]").click()
     time.sleep(1)
     driver.find_element(By.XPATH, "(//button[contains(@class,'btn btn-special')])[2]").click()
     body = "Tickets are available for Url " + in_url + " for price of " + str(
