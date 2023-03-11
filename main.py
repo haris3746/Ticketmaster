@@ -179,8 +179,8 @@ try:
 
                             break
                     except:
-                        logging.exception('msg')
-                        break
+                        #logging.exception('msg')
+                        continue
                 if status == "found":
                     break
             except:
@@ -188,5 +188,5 @@ try:
                 continue
         driver.quit()
 except:
-    logging.exception('msg')
+    #logging.exception('msg')
     pass
