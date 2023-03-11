@@ -24,22 +24,18 @@ SCRAPPER = False
 # driverr = webdriver.Chrome(options=options)
 
 # return driverr
-def driverInit():
-    option = uc.ChromeOptions()
-    useragentstr = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36"
-    option.add_argument("--log-level=3")
-    option.add_argument("--disable-infobars")
-    option.add_argument("--disable-extensions")
-    option.add_argument("--headless")
-    prefs = {"credentials_enable_service": False,
-             "profile.password_manager_enabled": False,
-             "profile.default_content_setting_values.notifications": 2
-             }
-    option.add_experimental_option("prefs", prefs)
 
-    option.add_argument(f"user-agent={useragentstr}")
-    driverr = uc.Chrome(options=option)
+
+def driverInit():
+    options = Options()
+    options.add_argument("--headless")
+
+    options.add_argument("window-size=1400,1500")
+
+    driverr = webdriver.Chrome(options=options)
+
     return driverr
+
 
 
 def scroll_down(driver):
