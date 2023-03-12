@@ -132,8 +132,6 @@ try:
     input_price = output['price']
     notification_email = output['email']
     for i in range(0, len(url)):
-        if url[i] == url[i-1]:
-            continue
         if search("www.ticketmaster.fr", url[i]):
             print("in")
             driver = driverInit()
