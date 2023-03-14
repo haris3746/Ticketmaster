@@ -135,6 +135,8 @@ try:
     input_price = output['price']
     notification_email = output['email']
     for i in range(0, len(url)):
+        #if url[i] ==url[i-1]:
+         #   continue
         if search("www.ticketmaster.fr", url[i]):
             print("in")
             driver = driverInit()
@@ -146,6 +148,12 @@ try:
             # driver.find_element(By.ID, "login-email").send_keys("muhammadharis3746@gmail.com")
             # driver.find_element(By.ID, "login-password").send_keys("Yes54321" + Keys.ENTER)
             time.sleep(2)
+            try:
+                driver.find_element(By.XPATH, "//button[@class='btn btn-standard btn-large event-captcha-btn']").click()
+                time.sleep(2)
+            except:
+                pass
+
             scroll_down(driver)
             try:
                 n = int(driver.find_element(By.XPATH, "//h2[@class='results-filter-info']//strong[1]").text)
@@ -165,6 +173,12 @@ try:
                     status = ""
                     driver.get(href[num])
                     time.sleep(3)
+                    try:
+                        driver.find_element(By.XPATH,
+                                            "//button[@class='btn btn-standard btn-large event-captcha-btn']").click()
+                        time.sleep(2)
+                    except:
+                        pass
                     scroll_down(driver)
                     try:
                         driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[5]/div[1]/button").click()
