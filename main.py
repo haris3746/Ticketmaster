@@ -88,7 +88,10 @@ def send_email(body, email):
 def add_cart(driver, price, url, email, in_url, input_price):
     try:
 
-        driver.find_element(By.XPATH, "//div[@class='session-price-cat']//button[" + str(price) + "]")
+        #driver.find_element(By.XPATH, "//div[@class='session-price-cat']//button[" + str(price) + "]").click()
+        driver.find_element(By.XPATH, "(//button[@class='btn btn-icon btn-small session-price-cat-btn'])[" + str(price) + "]").click()
+
+        print("yes")
 
 
 
